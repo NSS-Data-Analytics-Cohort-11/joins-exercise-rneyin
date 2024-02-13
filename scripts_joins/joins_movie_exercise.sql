@@ -1,5 +1,5 @@
 SELECT *
-FROM specs
+FROM RATING
 
 -- --## Movie Database Joins Exercise 
 
@@ -61,6 +61,20 @@ limit 5;
 
 
 -- 6. How many movies in the dataset are distributed by a company which is not headquartered in California? Which of these movies has the highest imdb rating?
+
+
+SELECT s.film_title, r.imdb_rating, COUNT(s.domestic_distributor_id) AS movie_num
+FROM distributors AS d
+INNER JOIN specs as s
+ON d.distributor_id = s.domestic_distributor_id
+INNER JOIN rating AS r
+ON s.movie_id= r.movie_id 
+WHERE d.headquarters <> '%CA'
+GROUP BY r.imdb_rating, s.film_title	
+ORDER BY r.imdb_rating DESC
+
+--answer:419 movie are distributed by a company not hedquarterd in CA. The Dark Knight has the highest imdb rating.
+
 -- SELECT s.flm_title, r.imdb_rating
 -- FROM specs
 -- (SELECT COUNT(s.domestic_distributor_id) AS movie_num
@@ -72,15 +86,35 @@ limit 5;
 -- ON s.movie_id= r.movie_id) AS sub
 -- ORDER BY r.imdb_rating
 
---answer:419
 
 
 -- 7. Which have a higher average rating, movies which are over two hours long or movies which are under two hours?
-SELECT s.film_title, AVG(r.imdb_rating) AS avg_rating
+
+SELECT movie_length, AVG(avg_rating) AS avg_rating_overall
+FROM
+(SELECT s.length_in_min,AVG(r.imdb_rating) AS avg_rating,
+	CASE WHEN s.length_in_min > 120 THEN 'Movie is longer than 2hrs'
+	WHEN s.length_in_min < 120 THEN 'Movie is shorter than 2hrs'
+	ELSE 'Movie is 2hrs long' END AS movie_length
 FROM specs AS s
 INNER JOIN rating AS r
 USING(movie_id)
-GROUP BY 
+GROUP BY s.length_in_min, movie_length
+ORDER BY avg_rating DESC)
+GROUP BY movie_length
+
+-- answer: Movies over 2 hrs have a higher average rating
 
 
-ORDER BY avg_rating DESC
+
+
+
+-- SELECT s.length_in_min, AVG(r.imdb_rating) AS avg_rating,	
+-- 	CASE WHEN s.length_in_min > 120 THEN 'Movie is longer than 2hrs'
+-- 	WHEN s.length_in_min < 120 THEN 'Movie is shorter than 2hrs'
+-- 	ELSE 'Movie is 2hrs long' END AS movie_length
+-- FROM specs AS s
+-- INNER JOIN rating AS r
+-- USING(movie_id)
+-- GROUP BY s.length_in_min, movie_length
+-- ORDER BY avg_rating DESC
