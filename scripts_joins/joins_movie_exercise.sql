@@ -104,8 +104,18 @@ ORDER BY avg_rating DESC)
 GROUP BY movie_length
 
 -- answer: Movies over 2 hrs have a higher average rating
-
-
+-- rEVIEW_aNSWE
+SELECT 
+CASE
+	WHEN length_in_min >= 120 THEN 'Movie is longer than 2hrs'
+	WHEN length_in_min < 120 THEN 'Movie is shorter than 2hrs'
+-- 	ELSE 'Movie is 2hrs long' 
+	END AS movie_length,
+	ROUND(AVG(imdb_rating),2)
+	FROM specs
+	INNER JOIN rating
+	USING(movie_id)
+	GROUP BY movie_length
 
 
 
